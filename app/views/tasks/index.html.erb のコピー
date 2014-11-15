@@ -1,0 +1,41 @@
+
+<h1>タスク管理アプリ</h1>
+	<p>
+		<%= form_for @task do |f|%>
+		<%= f.text_field :title %>
+		<%= f.submit%>
+		<% end %>
+	</p>
+
+<div id="sortable" data-update-url="<%= sort_tasks_url %>">
+	<% @tasks.each do |task| %>
+        <%= content_tag_for :p, task do %>
+        	<%= check_box_tag '','',task.done, {'data-id'=>task.id} %>
+        	<%= task.title %>
+        	<%= link_to "[delete]", task_path(task.id), remote: true,method: :delete, data: { confirm: "are you sure?" } %>
+        <% end %>
+    <% end %>
+</div>
+
+<ul id="sortable2" class="connectedSortable" data-update-url="<%= sort_tasks_url %>">
+</ul>
+ 
+	<script>
+		$(function(){
+			$('input[type=checkbox]').click(function(){
+				var idTask=$(this).data('id');
+				$.post('/tasks/'+idTask+'/toggle');
+			});
+			$('a[data-method="delete"]').on('ajax:success', function(xhr,data,status){
+    			$('#task_'+data.task.id).fadeOut();
+			});
+			
+		});
+		$(function() {			
+			$("#sortable").sortable(
+					{update: function(){$.post($(this).data('update-url'),$(this).sortable("serialize"))}}
+					)
+
+
+		});
+	</script>

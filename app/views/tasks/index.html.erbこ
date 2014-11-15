@@ -1,0 +1,34 @@
+<div class="sortable">
+<h1>タスク管理アプリ</h1>
+
+	<% @tasks.each do |task| %>
+        <p id ="task_<%= task.id %>">
+        	<%= check_box_tag '','',task.done, {'data-id'=>task.id} %>
+        	<%= task.title %>
+        	<%= link_to "[delete]", task_path(task.id), remote: true,method: :delete, data: { confirm: "are you sure?" } %>
+        </p>
+    <% end %>
+
+	<p>
+		<%= form_for @task do |f|%>
+		<%= f.text_field :title %>
+		<%= f.submit%>
+		<% end %>
+	</p>
+</div>
+	<script>
+		$(function(){
+			$('input[type=checkbox]').click(function(){
+				var idTask=$(this).data('id');
+				$.post('/tasks/'+idTask+'/toggle');
+			});
+			$('a[data-method="delete"]').on('ajax:success', function(xhr,data,status){
+    			$('#task_'+data.task.id).fadeOut();
+			});
+			
+		});
+		$(function() {
+			$(".sortable").sortable();
+			$(".sortable").disableSelection();
+		});
+	</script>
